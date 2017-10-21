@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.crud.dao.EmployeeMapper">
+  <resultMap id="BaseResultMap" type="com.ssm.bean.Employee">
+    <id column="EMP_ID" jdbcType="DECIMAL" property="empId" />
+    <result column="EMP_NAME" jdbcType="VARCHAR" property="empName" />
+    <result column="AGE" jdbcType="DECIMAL" property="age" />
+    <result column="GENDER" jdbcType="CHAR" property="gender" />
+    <result column="EMAIL" jdbcType="VARCHAR" property="email" />
+    <result column="WORKDATE" jdbcType="TIMESTAMP" property="workdate" />
+    <result column="DEPTID" jdbcType="DECIMAL" property="deptid" />
+  </resultMap>
+  <resultMap id="BaseResultMapWithDept" type="com.ssm.bean.Employee">
+    <id column="EMP_ID" jdbcType="DECIMAL" property="empId" />
+    <result column="EMP_NAME" jdbcType="VARCHAR" property="empName" />
+    <result column="AGE" jdbcType="DECIMAL" property="age" />
+    <result column="GENDER" jdbcType="CHAR" property="gender" />
+    <result column="EMAIL" jdbcType="VARCHAR" property="email" />
+    <result column="WORKDATE" jdbcType="TIMESTAMP" property="workdate" />
+    <result column="DEPTID" jdbcType="DECIMAL" property="deptid" />
+    <association property="department" javaType="com.ssm.bean.Department">
+    	<id column="dept_id" property="deptId"/>
+    	<result column="dept_name" property="deptName" />
+    </association>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    EMP_ID, EMP_NAME, AGE, GENDER, EMAIL, WORKDATE, DEPTID
+  </sql>
+  <!-- 新增查询员工信息的同时携带部门信息 -->
+  <sql id="Base_Column_List_WithDept">
+    emp_id, emp_name, age, gender, email, workdate, e.deptid, d.dept_id,dept_name
+  </sql>
+  <select id="selectByExampleWithDept" parameterType="com.ssm.bean.EmployeeExample" resultMap="BaseResultMapWithDept">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List_WithDept" />
+    from ssm_shiro_emps e join ssm_shiro_depts d on e.deptid = d.dept_id 
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+      order by emp_id asc
+  </select>
+  <select id="selectByPrimaryKeyWithDept" parameterType="java.math.BigDecimal" resultMap="BaseResultMapWithDept">
+    select 
+    <include refid="Base_Column_List_WithDept" />
+    from ssm_shiro_emps e join ssm_shiro_depts d on e.deptid = d.dept_id 
+    where EMP_ID = #{empId,jdbcType=DECIMAL}
+  </select>
+  <select id="selectByExample" parameterType="com.ssm.bean.EmployeeExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from SSM_SHIRO_EMPS
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.math.BigDecimal" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from SSM_SHIRO_EMPS
+    where EMP_ID = #{empId,jdbcType=DECIMAL}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.math.BigDecimal">
+    delete from SSM_SHIRO_EMPS
+    where EMP_ID = #{empId,jdbcType=DECIMAL}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.ssm.bean.EmployeeExample">
+    delete from SSM_SHIRO_EMPS
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ssm.bean.Employee">
+    insert into SSM_SHIRO_EMPS (EMP_ID, EMP_NAME, AGE, 
+      GENDER, EMAIL, WORKDATE, 
+      DEPTID)
+    values (#{empId,jdbcType=DECIMAL}, #{empName,jdbcType=VARCHAR}, #{age,jdbcType=DECIMAL}, 
+      #{gender,jdbcType=CHAR}, #{email,jdbcType=VARCHAR}, #{workdate,jdbcType=TIMESTAMP}, 
+      #{deptid,jdbcType=DECIMAL})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ssm.bean.Employee">
+    insert into SSM_SHIRO_EMPS
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="empId != null">
+        EMP_ID,
+      </if>
+      <if test="empName != null">
+        EMP_NAME,
+      </if>
+      <if test="age != null">
+        AGE,
+      </if>
+      <if test="gender != null">
+        GENDER,
+      </if>
+      <if test="email != null">
+        EMAIL,
+      </if>
+      <if test="workdate != null">
+        WORKDATE,
+      </if>
+      <if test="deptid != null">
+        DEPTID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="empId != null">
+        #{empId,jdbcType=DECIMAL},
+      </if>
+      <if test="empName != null">
+        #{empName,jdbcType=VARCHAR},
+      </if>
+      <if test="age != null">
+        #{age,jdbcType=DECIMAL},
+      </if>
+      <if test="gender != null">
+        #{gender,jdbcType=CHAR},
+      </if>
+      <if test="email != null">
+        #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="workdate != null">
+        #{workdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deptid != null">
+        #{deptid,jdbcType=DECIMAL},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ssm.bean.EmployeeExample" resultType="java.lang.Long">
+    select count(*) from SSM_SHIRO_EMPS
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update SSM_SHIRO_EMPS
+    <set>
+      <if test="record.empId != null">
+        EMP_ID = #{record.empId,jdbcType=DECIMAL},
+      </if>
+      <if test="record.empName != null">
+        EMP_NAME = #{record.empName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.age != null">
+        AGE = #{record.age,jdbcType=DECIMAL},
+      </if>
+      <if test="record.gender != null">
+        GENDER = #{record.gender,jdbcType=CHAR},
+      </if>
+      <if test="record.email != null">
+        EMAIL = #{record.email,jdbcType=VARCHAR},
+      </if>
+      <if test="record.workdate != null">
+        WORKDATE = #{record.workdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.deptid != null">
+        DEPTID = #{record.deptid,jdbcType=DECIMAL},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update SSM_SHIRO_EMPS
+    set EMP_ID = #{record.empId,jdbcType=DECIMAL},
+      EMP_NAME = #{record.empName,jdbcType=VARCHAR},
+      AGE = #{record.age,jdbcType=DECIMAL},
+      GENDER = #{record.gender,jdbcType=CHAR},
+      EMAIL = #{record.email,jdbcType=VARCHAR},
+      WORKDATE = #{record.workdate,jdbcType=TIMESTAMP},
+      DEPTID = #{record.deptid,jdbcType=DECIMAL}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ssm.bean.Employee">
+    update SSM_SHIRO_EMPS
+    <set>
+      <if test="empName != null">
+        EMP_NAME = #{empName,jdbcType=VARCHAR},
+      </if>
+      <if test="age != null">
+        AGE = #{age,jdbcType=DECIMAL},
+      </if>
+      <if test="gender != null">
+        GENDER = #{gender,jdbcType=CHAR},
+      </if>
+      <if test="email != null">
+        EMAIL = #{email,jdbcType=VARCHAR},
+      </if>
+      <if test="workdate != null">
+        WORKDATE = #{workdate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="deptid != null">
+        DEPTID = #{deptid,jdbcType=DECIMAL},
+      </if>
+    </set>
+    where EMP_ID = #{empId,jdbcType=DECIMAL}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ssm.bean.Employee">
+    update SSM_SHIRO_EMPS
+    set EMP_NAME = #{empName,jdbcType=VARCHAR},
+      AGE = #{age,jdbcType=DECIMAL},
+      GENDER = #{gender,jdbcType=CHAR},
+      EMAIL = #{email,jdbcType=VARCHAR},
+      WORKDATE = #{workdate,jdbcType=TIMESTAMP},
+      DEPTID = #{deptid,jdbcType=DECIMAL}
+    where EMP_ID = #{empId,jdbcType=DECIMAL}
+  </update>
+</mapper>

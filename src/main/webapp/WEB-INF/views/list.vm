@@ -1,0 +1,278 @@
+#set( $contextPath= $request.getContextPath())
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>员工查询</title>
+<script type="text/javascript" src="${contextPath}/static/jquery-js/jquery-3.2.1.min.js"></script>
+<link rel="stylesheet" href="${contextPath}/static/bootstrap-3.3.7-dist/css/bootstrap.min.css" >
+<script src="${contextPath}/static/bootstrap-3.3.7-dist/js/bootstrap.min.js" crossorigin="anonymous"></script>
+</head>
+<body>
+	<!-- 导入增删改模态框 -->
+	#include("add.vm","update.vm")
+	
+	<!-- 搭建显示界面 -->
+	<div class="container" >
+			<!-- 搭建显示界面 -->
+	<div class="container" >
+		<!-- 显示标题栏 -->
+		<div class="row">
+			<div class="col-md-12">
+				<h1>EMP-CRUD</h1>
+			</div>
+		</div>
+		
+		<!-- 新增和删除按钮 -->
+		<div class="row">
+			<div class="col-md-4 col-md-offset-8">
+				<button type="button" class="btn  btn-primary" id="input_emp_button" >新增</button>
+				<button type="button" class="btn btn-danger" id="delete_emp_button">删除</button>
+			</div>
+		</div>
+		
+		<!-- 显示动态信息 -->
+		<div id="dynamic"></div>
+	</div>
+	</div>	
+	
+	<script type="text/javascript">
+		/*  发送请求显示员工分页信息  */
+		to_page(1);
+		
+		/* $(function() {
+			alert($("#emp_check_all").parents("tr").find("th:eq(2)").text());
+		})  */
+		
+		/* 发送请求跳转指定页码 */
+		function to_page(pn){
+			$("#dynamic").load("${contextPath}/emps?pn="+pn); // 插入返回页面信息
+			/*或  
+				$.ajax({
+				url:"${contextPath}/emps",
+				type:"GET",	
+				data:"pn="+pn,
+				success:function(result){
+					$("#dynamic").html(result);
+				}
+			});  */ 
+		}
+		
+		
+		/* 员工添加模块 */
+		$("#input_emp_button").click(function() {
+			
+			/* 1、把表单的所有输入元素重置为它们的默认值. */
+			$("#input_emp_modal form")[0].reset();
+			/*  清空表单(所有子标签)样式. */
+			$("#input_emp_modal form").find("*").removeClass("has-success has-error");
+			/*  清空表单的提示信息. */
+			$("#input_emp_modal form").find(".help-block").text("");
+			
+			
+			/* 2、发送请求加载添加模块动态视图部分：部门信息 */
+			get_Dept_Message("#input_department");
+			
+			/* 3、 开启模态框 */
+			$("#input_emp_modal").modal({
+				backdrop: false
+			});
+			
+			// 添加校验单击响应函数
+			$("#input_empName").blur(function(){
+				empName_check("#input_empName");
+			});
+			
+			$("#input_email").blur(function(){
+				email_check("#input_email");
+			});
+			$("#input_workdate").blur(function(){
+				workdate_check("#input_workdate");
+			});
+		});
+		
+		/* 、发送请求加载部门信息 */
+		function get_Dept_Message(ele){
+			$(ele).empty();
+			$(ele).load("${contextPath}/depts"); // 将返回页面添加到当前标签中
+			/* 或者
+			$.ajax({
+				url:"${contextPath}/getDepts",
+				type:"GET",
+				success:function(result){
+					$(ele).html(result);   将返回页面添加到当前标签中
+				}
+			}); */
+		};
+		
+		// 数据格式校验函数
+		function validate(tag,status,msg){
+			// 清除留存的校验显示状态	
+			$(tag).parent().removeClass("has-success has-error");
+			$(tag).next("span").text("");
+			
+			// 显示校验状态
+			if(status == "success"){
+				$(tag).parent().addClass("has-success");
+			}else if(status == "error"){
+				$(tag).parent().addClass("has-error");
+			}
+			//显示校验信息
+			$(tag).next("span").text(msg);
+		}
+		
+		// 检验员工名是否可用
+		function empName_avaliable(empName_input){
+			$.ajax({
+				url:"${contextPath}/checkUser",
+				type:"GET",
+				data:"empName="+empName_input,
+				success:function(result){
+					if(result.code == 100){
+						validate("#input_empName","success","");
+					} else if (result.code == 200) {
+						validate("#input_empName","error",result.extend.msg);
+						// ajax 请求里设置的返回值对函数无效
+						// return false ======无效
+					}
+				}
+			});
+		}
+		
+		/* 数据格式前端校验  */
+		/* 姓名校验 */
+		function empName_check(ele){
+			var empName_input = $(ele).val();
+			var regex = /(^[\u2E80-\u9FFF]+$) ||(^[a-zA-Z0-9_-]{5,16}$)/;
+			if (empName_input == ""){
+				validate(ele,"error","员工姓名不能为空");
+				return false;
+			}
+			// 通过正则表达式进行格式校验
+			if(regex.test(empName_input)){
+				// 员工名可用性校验（保存时仍需进行后端校验）
+				empName_avaliable(empName_input);
+			}else{
+				validate(ele,"error","输入的姓名格式不正确");
+				return false;
+			}
+			return true; // 校验通过返回 true
+		}
+		
+		/* 邮箱校验 */
+		function email_check(ele){
+			var email_input = $(ele).val();
+			var regex =  /^([a-zA-Z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/;
+			if (email_input == ""){
+				validate(ele,"error","邮箱不能为空");
+				return false;
+			}
+			// 通过正则表达式进行格式校验
+			if(regex.test(email_input)){
+				validate(ele,"success","");
+			}else{
+				validate(ele,"error","输入的邮箱格式不正确");
+				return false;
+			}
+			return true; // 校验通过返回 true
+		}
+		
+		/* 日期格式校验 */
+		function workdate_check(ele){
+			var workdate_input = $(ele).val();
+			var regex =  /^[1-9]\d{3}\/([1-9]|1[0-2])\/([1-9]|[1-2]\d|3[0-1])$/;
+			if (workdate_input == ""){
+				validate(ele,"error","日期不能为空");
+				return false;
+			}
+			// 通过正则表达式进行格式校验
+			if(regex.test(workdate_input)){
+				validate(ele,"success","");
+			}else{
+				validate(ele,"error","输入的日期格式不正确");
+				return false;
+			}
+			return true; // 校验通过返回 true
+		}
+		
+		// 员工保存
+		$("#save_emp_button").click(function () {
+			// 判断前端所有校验是否通过，如果不通过，则不能发送请求
+			if(!email_check("#input_email") || !empName_check("#input_empName") || !workdate_check("#input_workdate"))
+				return false;
+			// Ajax serialize()：可以序列化表单（form）内容为字符串。
+			//alert($("#input_emp_modal form").serialize());
+			 $.ajax({
+				url:"${contextPath}/emp",
+				type:"POST",
+				data:$("#input_emp_modal form").serialize(),
+				success:function(result){
+					if(result.code == 200){
+						// 保存时仍需要在后端进行员工名重复性校验(姓名可用时进行其它判断)
+						if(result.extend.msg){
+							validate($("#input_empName"), "error", msg);
+						}
+						// 后端校验，防止用户非法通过前端校验
+						if(result.extend.fieldErrors.empName != undefined){
+							validate($("#input_empName"), "error", result.extend.fieldErrors.empName);
+						}
+						
+						if(result.extend.fieldErrors.email != undefined){
+							validate($("#input_email"), "error", result.extend.fieldErrors.email);
+						}
+					} else{
+						// 关闭模态框
+						$("#input_emp_modal").modal("hide");
+						/* 页面跳转到最后一页
+						分页参数合理化：查询的页码大于总页码时，会自动跳转到最后一页 */
+						to_page($(".active").attr("pages")+1);
+					}
+				}
+			});
+		});
+		
+		/*  绑定事件的两种方式：1、创建按钮时绑定事件；2、按钮创建后绑定（推荐）
+		使用 on 来绑定编辑响应函数 */
+		
+		/* 员工修改 */
+		$(document).on("click",".btn-edit",function(){
+			
+			/* 清空表单(所有子标签)样式. */
+			$("#update_emp_modal form").find("*").removeClass("has-success has-error");
+			
+			/* 清空表单的提示信息. */
+			$("#update_emp_modal form").find(".help-block").text("");
+			
+			var empId = $(this).parents("tr").find("th:eq(1)").text();
+			get_Emp_Message(empId);
+			/* 将empId 存入更新按钮中 */
+			$("#update_emp_button").attr("empId",empId);
+			
+			/* 开启模态框 */
+			$("#update_emp_modal").modal({
+				backdrop: false
+			});
+			
+			/* 信息校验 */
+			$("#update_email").blur(function(){
+				email_check("#update_email");
+			});
+			$("#update_workdate").blur(function(){
+				workdate_check("#update_workdate");
+			});
+		});
+		
+		/* 根据id 获取指定员工的信息 */
+		function get_Emp_Message(id){
+			$("#update_emp_modal form").load("${contextPath}/emp/"+id);
+			/* $.ajax({
+				url:"${contextPath}/emp/"+id,
+				type:"GET",
+				success:function(result){
+					console.log(result);
+					$("#update_emp_modal form").html(result);
+				}
+			});  */
+		}
+	</script>
+</body>
+</html>

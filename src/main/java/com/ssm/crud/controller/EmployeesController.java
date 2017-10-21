@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.ssm.bean.Employee;
@@ -35,7 +36,7 @@ public class EmployeesController {
 	 */
 	@ResponseBody
 	@RequestMapping("/emps")
-	public Msg getEmps(@RequestParam(value="pn",defaultValue="1") Integer pn){
+	public ModelAndView getEmps(@RequestParam(value="pn",defaultValue="1") Integer pn){
 		// 1、引入 PageHelper 分页查询插件
 			// 开启分页功能: 调用 PageHelper.startPage() 方法，传入页码，及每页的大小
 		PageHelper.startPage(pn, 5);
@@ -44,28 +45,15 @@ public class EmployeesController {
 		
 		// 2、使用 PageInfo 包装查询后的结果，然后将其交给页面即可
 			// PageInfo 封装了详细的分页信息，包含了查询到的结果数据，传入连续显示的页数
-		PageInfo<Employee> pageInfo = new PageInfo<>(emps, 5);
+		PageInfo<Employee> pageInfo = new PageInfo<Employee>(emps, 5);
+		
 		
 		// 将分页信息加入请求域中
-		return Msg.success().add("pageInfo",pageInfo);
+		return new ModelAndView("page", "pageInfo", pageInfo);
 	}
-
-	/*@RequestMapping("/emps")
-	public String getEmps(@RequestParam(value="pn",defaultValue="1")Integer pn, Model model ){
-		// 开启分页功能
-		PageHelper.startPage(pn, 5);
-		
-		List<Employee> emps = employeesService.getEmps();
-		
-		PageInfo<Employee> pageInfo = new PageInfo<>(emps, 5);
-		
-		// 将分页信息加入请求域中
-		model.addAttribute("pageInfo", pageInfo);
-		return "list";
-	}*/
 	
 	/**
-	 * 员工添加
+	 * 员工添加保存
 	 * @param employee
 	 * @return
 	 */
@@ -81,7 +69,7 @@ public class EmployeesController {
 		if(result.hasErrors()){
 			// 校验失败，应返回失败，并在模态框中显示错误信息
 			List<FieldError> errors = result.getFieldErrors();
-			Map<String, Object> errorsMap = new HashMap<>();
+			Map<String, Object> errorsMap = new HashMap<String, Object>();
 			for(FieldError error: errors ){
 				// Map: key-错误字段名， value-错误信息
 				errorsMap.put(error.getField(), error.getDefaultMessage());
@@ -121,14 +109,14 @@ public class EmployeesController {
 	 */
 	@ResponseBody
 	@RequestMapping(value="/emp/{id}")
-	public Msg getEmp(@PathVariable("id") Integer id){
+	public ModelAndView getEmp(@PathVariable("id") Integer id){
 		Employee emp = employeesService.getEmp(id);
-		return Msg.success().add("emp", emp);
+		return new ModelAndView("emp", "emp", emp);// 参数依次为视图名、变量名、变量值 
 	}
 	
 	/**
 	 * 员工更新
-	 * @param empId，根据主键更新时需要 {empId} 的名称和 bean 的属性名一致，否则获取不到请求信息的主键值
+	 * @param- empId，根据主键更新时需要 {empId} 的名称和 bean 的属性名一致，否则获取不到请求信息的主键值
 	 * @return
 	 * 
 	 * Ajax 发送 PUT 请求的两种方式：
@@ -160,7 +148,7 @@ public class EmployeesController {
 		if(empIds.contains("-")){
 			// 批量删除
 			String[] empIdStrs = empIds.split("-");
-			List<BigDecimal> empIdList = new ArrayList<>();
+			List<BigDecimal> empIdList = new ArrayList<BigDecimal>();
 			for(String empId: empIdStrs){  // 组装 id 集合
 				empIdList.add(new BigDecimal(empId));
 			}

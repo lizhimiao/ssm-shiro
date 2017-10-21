@@ -1,0 +1,102 @@
+<!-- 表格显示员工列表 -->
+<table class="table table-hover">
+	<!-- 首行员工信息标题列 -->
+	<thead>
+		<tr>
+			<th><input type="checkbox" id="emp_check_all"/></th>
+			<th>#</th>
+			<th>empName</th>
+			<th>age</th>
+			<th>gender</th>
+			<th>email</th>
+			<th>workdate</th>
+			<th>department</th>
+			<th>操作</th>
+		</tr>
+	</thead>
+	<!-- 显示员工列表 -->
+	<tbody id="emps_tbody">
+		#foreach($emp in ${pageInfo.list})
+			<tr>
+				<th><input type='checkbox' class='emp_checkbox'/></th>
+				<th>$!emp.empId</th>
+				<th>$!emp.empName</th>
+				<th>$!emp.age</th>
+				#if($!emp.gender == 'm')
+					<th>男</th>
+				#else	
+					<th>女</th>
+				#end	
+				<th>$!emp.email</th>
+				<!-- 将要显示在页面的日期进行本地化处理 -->
+				<th>$!dateTool.format('yyyy/MM/dd',$!emp.workdate)</th>
+				<th>$!emp.department.deptName</th>
+				<th>
+					<button type='button' class='btn  btn-primary btn-sm btn-edit'>
+						<span class='glyphicon glyphicon glyphicon-pencil'></span>编辑
+					</button>
+					<button type='button' class='btn  btn-danger btn-sm btn-delete'>
+						<span class='glyphicon glyphicon glyphicon-pencil'></span>删除
+					</button>
+				</th>
+			</tr>
+		#end
+	</tbody>
+</table>
+
+<!-- 显示分页信息 （分页文字信息和分页条）-->
+<div class="row">
+	<div class="col-md-6" id="pageInfo_text">
+		当前第 $pageInfo.pageNum 页，共 $pageInfo.pages 页，共 $pageInfo.total 条记录
+	</div>
+	
+	<nav aria-label="Page navigation" id="pageInfo_nav">
+		 <ul class="pagination">
+		 	<li onclick="firstPage_click()"><a href="#">首页</a></li>
+			<li onclick="prePage_click()">
+		    	<a aria-label="Previous">
+		   			<span aria-hidden="true">&laquo;</span>
+		    	</a>
+		    </li>
+		    #foreach($num in $pageInfo.navigatepageNums)
+		    	#if($num == $pageInfo.pageNum) 
+					<li class="active num" pages="$pageInfo.pages"><a href="#">$num</a></li>
+				#else
+					 <li class="num" ><a>$num</a></li>	
+		   		#end
+		   		
+		   	#end		 
+			<li onclick="nextPage_click()">
+		    	<a aria-label="Next">
+		   			<span aria-hidden="true">&raquo;</span>
+		    	</a>
+		    </li>
+		    <li onclick="lastPage_click()"><a >尾页</a></li>
+		</ul>
+	</nav>
+</div>
+
+<script type="text/javascript">
+	//添加页码单击响应事件
+	
+	function firstPage_click(){
+		to_page(1);
+	}
+	
+	function prePage_click(){
+		to_page("$pageInfo.pageNum"-1);
+	}
+	
+	$(".num").on("click",function(){
+		to_page($(this).find("a").text());
+	})
+	
+	
+	function nextPage_click(){
+		to_page($pageInfo.pageNum+1);
+	}
+	
+	function lastPage_click(){
+		to_page($pageInfo.pages);
+	}
+</script>

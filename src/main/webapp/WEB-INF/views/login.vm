@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>员工登录</title>
+</head>
+<body>
+	
+	#set( $contextPath= $request.getContextPath())
+	<!--  
+	$contextPath 
+	-->
+	 <a href="${contextPath}//velocity/list">list</a>
+</body>
+</html>

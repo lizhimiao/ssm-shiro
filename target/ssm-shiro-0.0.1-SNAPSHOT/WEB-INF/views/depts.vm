@@ -1,0 +1,8 @@
+#foreach($dept in $depts)
+	<option value="$dept.deptId">$dept.deptName</option>
+#end	
+
+	
+
+
+

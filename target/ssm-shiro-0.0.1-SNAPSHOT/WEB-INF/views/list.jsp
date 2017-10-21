@@ -6,9 +6,9 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>员工查询</title>
 <% pageContext.setAttribute("contextPath",request.getContextPath());  %>
-<script type="text/javascript" src="${contextPath }/static/jquery-js/jquery-3.2.1.min.js"></script>
-<link rel="stylesheet" href="${contextPath }/static/bootstrap-3.3.7-dist/css/bootstrap.min.css" >
-<script src="${contextPath }/static/bootstrap-3.3.7-dist/js/bootstrap.min.js"  crossorigin="anonymous"></script>
+<script type="text/javascript" src="${contextPath}/static/jquery-js/jquery-3.2.1.min.js"></script>
+<link rel="stylesheet" href="${contextPath}/static/bootstrap-3.3.7-dist/css/bootstrap.min.css" >
+<script src="${contextPath}/static/bootstrap-3.3.7-dist/js/bootstrap.min.js"  crossorigin="anonymous"></script>
 </head>
 <body>
 	<!-- 员工添加模态框 -->
@@ -45,7 +45,7 @@
 							<div class="col-sm-10">
 								<label class="radio-inline"> 
 									<input type="radio" name="gender" id="input_gender1" value="m"
-									 checked="checked"> 男
+									 checked=true> 男
 								</label> 
 								<label class="radio-inline"> 
 									<input type="radio" name="gender" id="input_gender2" value="f"> 女
@@ -118,7 +118,7 @@
 							<div class="col-sm-10">
 								<label class="radio-inline"> 
 									<input type="radio" name="gender" id="update_gender1" value="m"
-									 checked="checked"> 男
+									 checked=true> 男
 								</label> 
 								<label class="radio-inline"> 
 									<input type="radio" name="gender" id="update_gender2" value="f"> 女
@@ -262,7 +262,7 @@
 				var workdateTh = $("<th></th>").append(date.toLocaleDateString());
 				var deptIdTh = $("<th></th>").append(emp.department.deptName);
 				/* 为编辑按钮添加一个自定义的属性来表示当前员工的 id 值
-				（获取当前员工 id 的另一种方式：$(this).parents("tr").find("th:eq(0)").text() */
+				（获取当前员工 id 的另一种方式：$(this).parents("tr").find("th:eq(1)").text() */
 				var editButtonTh = $("<button type='button' class='btn  btn-primary btn-sm btn-edit'></button>")
 									.append("<span class='glyphicon glyphicon glyphicon-pencil'></span>")
 									.append(" 编辑");

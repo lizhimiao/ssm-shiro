@@ -14,7 +14,7 @@ public class Msg {
 	// 服务器响应请求的状态信息
 	private String message;
 	// 存放服务器响应信息
-	private Map<String, Object> extend  = new HashMap<>();
+	private Map<String, Object> extend  = new HashMap<String, Object>();
 	
 	public static Msg success(){
 		Msg msg = new Msg();

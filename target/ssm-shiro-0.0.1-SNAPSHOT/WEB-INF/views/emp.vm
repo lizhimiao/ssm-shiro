@@ -1,0 +1,76 @@
+#set( $contextPath= $request.getContextPath())
+<div class="form-group">
+	<label   class="col-sm-2 control-label">empName</label>
+	<div class="col-sm-10">
+		<p class="form-control-static" id="update_empName">$emp.empName</p>
+	</div>
+</div>
+<div class="form-group">
+	<label   class="col-sm-2 control-label">age</label>
+	<div class="col-sm-10">
+		<input class="form-control" type="text" name="age" id="update_age" 
+			placeholder="age">
+	</div>
+</div>
+<div class="form-group">
+	<label   class="col-sm-2 control-label">gender</label>
+	<div class="col-sm-10">
+		<label class="radio-inline"> 
+			<input type="radio" name="gender" id="update_gender1" value="m"
+			 checked=true> 男
+		</label> 
+		<label class="radio-inline"> 
+			<input type="radio" name="gender" id="update_gender2" value="f" > 女
+		</label>
+	</div>	
+</div>
+
+<div class="form-group">
+	<label   class="col-sm-2 control-label">email</label>
+	<div class="col-sm-10">
+		<input class="form-control" type="email" name="email" id="update_email"
+			placeholder="email@163.com">
+		<span class="help-block"></span>	
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-sm-2 control-label">workdate</label>
+	<div class="col-sm-10">
+		<input class="form-control" type="text" name="workdate" id="update_workdate"
+			placeholder="2017/1/1">
+		<span class="help-block"></span>	
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-sm-2 control-label">department</label>
+	<div class="col-sm-4">
+		<select class="form-control" id="update_department" name="deptid" >
+		</select>
+	</div>
+</div>	
+
+<script type="text/javascript">
+	$("#update_department").empty();
+	/* 发送请求加载添加模块动态视图部分：部门信息 */
+	$("#update_department").load("${contextPath}/depts"); 
+	
+	$(function () {
+		$("#update_department option").removeAttr("selected");
+		/* 将请求的信息填充到form 表单中 */
+		$("#update_age").val('$!emp.age');
+		$("#update_email").val('$!emp.email');
+		$("#update_workdate").val("$!dateTool.format('yyyy/MM/dd',$!emp.workdate)");
+		/* ------------------------------------.val([]) 设置一个单选或多选框的值(数组)----------- */
+		$("#update_emp_modal input[name=gender]").val(['$!emp.gender']);
+		$("#update_department").val(['$!emp.deptid']);
+		/* $.each($("#update_department option"),function(){
+			alert($!emp.deptid);
+			if($(this).val() == $!emp.deptid){
+				$(this).prop("selected",true);
+			}
+		});  */
+	})
+</script>
+
+
+
